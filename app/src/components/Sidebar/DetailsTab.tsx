@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Box, Typography, IconButton, Chip, Tooltip, Button } from '@mui/material'
 import { Theme } from '@mui/material/styles'
 import { withStyles } from '@mui/styles'
@@ -20,6 +20,7 @@ import DeleteSelectedTopicButton from './ValueRenderer/DeleteSelectedTopicButton
 import { useDecoder } from '../hooks/useDecoder'
 import SimpleBreadcrumb from './SimpleBreadcrumb'
 import AIAssistant from './AIAssistant'
+import { exportNodeToCsv, ExportScope } from '../../services/CsvExportService'
 
 interface Props {
   node?: q.TreeNode<any>
@@ -33,6 +34,17 @@ interface Props {
 function DetailsTab(props: Props) {
   const { node, compareMessage, classes } = props
   const decodeMessage = useDecoder(node)
+  const [exporting, setExporting] = useState(false)
+  const [scope, setScope] = useState<ExportScope>('recursive')
+
+  const handleExportCSV = useCallback(() => {
+    if (!node || exporting) return
+    setExporting(true)
+    setTimeout(() => {
+      exportNodeToCsv(node, scope)
+      setExporting(false)
+    }, 0)
+  }, [node, scope, exporting])
 
   const getDecodedValue = useCallback(
     () => node?.message && decodeMessage(node.message)?.message?.toUnicodeString(),
@@ -114,6 +126,23 @@ function DetailsTab(props: Props) {
               </IconButton>
             </Tooltip>
           )}
+          <Tooltip title={scope === 'recursive' ? 'Export topic + children as CSV' : 'Export this topic only as CSV'}>
+            <span>
+              <Button
+                size="small"
+                variant="outlined"
+                disabled={exporting}
+                onClick={handleExportCSV}
+                onContextMenu={e => {
+                  e.preventDefault()
+                  setScope(s => (s === 'recursive' ? 'node' : 'recursive'))
+                }}
+                sx={{ minWidth: 0, px: 1, fontSize: '0.75rem' }}
+              >
+                {exporting ? '⏳' : scope === 'recursive' ? '📄⬇' : '📄'}
+              </Button>
+            </span>
+          </Tooltip>
         </Box>
       </Box>
 

@@ -1,10 +1,12 @@
 import { Destroyable } from './Destroyable'
-import { Edge, Tree, TreeNode } from './'
+import { Tree, TreeNode } from './'
+import { Edge } from './Edge'
 import { MqttMessage } from '../../../events'
 import { Base64Message } from './Base64Message'
 
 export abstract class TreeNodeFactory {
   private static messageCounter = 0
+
   public static insertNodeAtPosition<ViewModel extends Destroyable>(
     edgeNames: Array<string>,
     node: TreeNode<ViewModel>
@@ -28,7 +30,6 @@ export abstract class TreeNodeFactory {
     const node = new TreeNode<ViewModel>()
     const edges = mqttMessage.topic.split('/')
 
-    mqttMessage.retain
     node.setMessage({
       ...mqttMessage,
       payload: mqttMessage.payload && new Base64Message(mqttMessage.payload?.base64Message),

@@ -1,5 +1,8 @@
 import { Destroyable } from './Destroyable'
-import { Edge, Message, RingBuffer, MessageHistory } from './'
+import { Edge } from './Edge'
+import type { Message } from './Message'
+import type { MessageHistory } from './MessageHistory'
+import { RingBuffer } from './RingBuffer'
 import { EventDispatcher } from '../../../events'
 
 export type TopicDataType = 'string' | 'json' | 'hex'
